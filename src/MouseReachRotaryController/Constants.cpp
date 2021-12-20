@@ -8,13 +8,13 @@
 #include "Constants.h"
 
 
-namespace rotary_pellet_controller_simple
+namespace mouse_reach_rotary_controller
 {
 namespace constants
 {
-CONSTANT_STRING(device_name,"rotary_pellet_controller_simple");
+CONSTANT_STRING(device_name,"mouse_reach_rotary_controller");
 
-CONSTANT_STRING(firmware_name,"RotaryPelletControllerSimple");
+CONSTANT_STRING(firmware_name,"MouseReachRotaryController");
 // Use semantic versioning http://semver.org/
 const modular_server::FirmwareInfo firmware_info =
   {

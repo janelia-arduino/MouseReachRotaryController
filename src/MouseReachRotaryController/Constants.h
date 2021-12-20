@@ -5,13 +5,13 @@
 // Authors:
 // Peter Polidoro polidorop@janelia.hhmi.org
 // ----------------------------------------------------------------------------
-#ifndef ROTARY_PELLET_CONTROLLER_SIMPLE_CONSTANTS_H
-#define ROTARY_PELLET_CONTROLLER_SIMPLE_CONSTANTS_H
+#ifndef MOUSE_REACH_ROTARY_CONTROLLER_CONSTANTS_H
+#define MOUSE_REACH_ROTARY_CONTROLLER_CONSTANTS_H
 #include "ConstantVariable.h"
 #include "StepDirControllerSimple.h"
 
 
-namespace rotary_pellet_controller_simple
+namespace mouse_reach_rotary_controller
 {
 namespace constants
 {

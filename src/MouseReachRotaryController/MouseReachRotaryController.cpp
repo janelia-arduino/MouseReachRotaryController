@@ -1,25 +1,25 @@
 // ----------------------------------------------------------------------------
-// RotaryPelletControllerSimple.cpp
+// MouseReachRotaryController.cpp
 //
 //
 // Authors:
 // Peter Polidoro polidorop@janelia.hhmi.org
 // ----------------------------------------------------------------------------
-#include "RotaryPelletControllerSimple.h"
+#include "MouseReachRotaryController.h"
 
 
-using namespace rotary_pellet_controller_simple;
+using namespace mouse_reach_rotary_controller;
 
-RotaryPelletControllerSimple::RotaryPelletControllerSimple()
+MouseReachRotaryController::MouseReachRotaryController()
 {
 }
 
-RotaryPelletControllerSimple::~RotaryPelletControllerSimple()
+MouseReachRotaryController::~MouseReachRotaryController()
 {
   disable(constants::channel);
 }
 
-void RotaryPelletControllerSimple::setup()
+void MouseReachRotaryController::setup()
 {
   // Parent Setup
   StepDirControllerSimple::setup();
@@ -52,15 +52,15 @@ void RotaryPelletControllerSimple::setup()
   // Properties
   // modular_server::Property & microsteps_per_step_property = modular_server_.createProperty(constants::microsteps_per_step_property_name,constants::microsteps_per_step_default);
   // microsteps_per_step_property.setRange(constants::microsteps_per_step_min,constants::microsteps_per_step_max);
-  // microsteps_per_step_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&RotaryPelletControllerSimple::updateTravelDurationRangeHandler));
+  // microsteps_per_step_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateTravelDurationRangeHandler));
 
   // modular_server::Property & steps_per_revolution_property = modular_server_.createProperty(constants::steps_per_revolution_property_name,constants::steps_per_revolution_default);
   // steps_per_revolution_property.setRange(constants::steps_per_revolution_min,constants::steps_per_revolution_max);
-  // steps_per_revolution_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&RotaryPelletControllerSimple::updateTravelDurationRangeHandler));
+  // steps_per_revolution_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateTravelDurationRangeHandler));
 
   modular_server::Property & pellets_per_revolution_property = modular_server_.createProperty(constants::pellets_per_revolution_property_name,constants::pellets_per_revolution_default);
   pellets_per_revolution_property.setRange(constants::pellets_per_revolution_min,constants::pellets_per_revolution_max);
-  pellets_per_revolution_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&RotaryPelletControllerSimple::updateTravelDurationRangeHandler));
+  pellets_per_revolution_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateTravelDurationRangeHandler));
 
   modular_server::Property & travel_duration_property = modular_server_.createProperty(constants::travel_duration_property_name,constants::travel_duration_default);
   travel_duration_property.setUnits(constants::duration_units);
@@ -89,26 +89,26 @@ void RotaryPelletControllerSimple::setup()
 
   // Functions
   modular_server::Function & get_pellet_index_function = modular_server_.createFunction(constants::get_pellet_index_function_name);
-  get_pellet_index_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&RotaryPelletControllerSimple::getPelletIndexHandler));
+  get_pellet_index_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::getPelletIndexHandler));
   get_pellet_index_function.setResultTypeLong();
 
   // modular_server::Function & get_position_function = modular_server_.createFunction(constants::get_position_function_name);
-  // get_position_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&RotaryPelletControllerSimple::getPositionHandler));
+  // get_position_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::getPositionHandler));
   // get_position_function.setResultTypeLong();
 
   // modular_server::Function & pellet_repeating_function = modular_server_.createFunction(constants::pellet_repeating_function_name);
-  // pellet_repeating_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&RotaryPelletControllerSimple::pelletRepeatingHandler));
+  // pellet_repeating_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::pelletRepeatingHandler));
   // pellet_repeating_function.setResultTypeBool();
 
   modular_server::Function & stop_function = modular_server_.function(step_dir_controller_simple::constants::stop_function_name);
-  stop_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&RotaryPelletControllerSimple::stopHandler));
+  stop_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::stopHandler));
 
   // modular_server::Function & stop_all_function = modular_server_.function(step_dir_controller_simple::constants::stop_all_function_name);
-  // stop_all_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&RotaryPelletControllerSimple::stopAllHandler));
+  // stop_all_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::stopAllHandler));
 
   // Callbacks
   modular_server::Callback & move_to_next_pellet_callback = modular_server_.createCallback(constants::move_to_next_pellet_callback_name);
-  move_to_next_pellet_callback.attachFunctor(makeFunctor((Functor1<modular_server::Interrupt *> *)0,*this,&RotaryPelletControllerSimple::moveToNextPelletHandler));
+  move_to_next_pellet_callback.attachFunctor(makeFunctor((Functor1<modular_server::Interrupt *> *)0,*this,&MouseReachRotaryController::moveToNextPelletHandler));
   move_to_next_pellet_callback.addProperty(travel_duration_property);
   move_to_next_pellet_callback.addProperty(reverse_direction_property);
   move_to_next_pellet_callback.addProperty(play_tone_before_move_property);
@@ -117,7 +117,7 @@ void RotaryPelletControllerSimple::setup()
 #endif
 
   modular_server::Callback & play_tone_callback = modular_server_.createCallback(constants::play_tone_callback_name);
-  play_tone_callback.attachFunctor(makeFunctor((Functor1<modular_server::Interrupt *> *)0,*this,&RotaryPelletControllerSimple::playToneHandler));
+  play_tone_callback.attachFunctor(makeFunctor((Functor1<modular_server::Interrupt *> *)0,*this,&MouseReachRotaryController::playToneHandler));
   play_tone_callback.addProperty(tone_frequency_property);
   play_tone_callback.addProperty(tone_duration_property);
 #if defined(__AVR_ATmega2560__)
@@ -126,7 +126,7 @@ void RotaryPelletControllerSimple::setup()
 
 }
 
-void RotaryPelletControllerSimple::moveToNextPellet(const long travel_duration,
+void MouseReachRotaryController::moveToNextPellet(const long travel_duration,
                                                     const bool reverse_direction,
                                                     const bool play_tone_before_move)
 {
@@ -162,7 +162,7 @@ void RotaryPelletControllerSimple::moveToNextPellet(const long travel_duration,
   moveByAt(constants::channel,pellet_position_delta,speed);
 }
 
-void RotaryPelletControllerSimple::moveToNextPellet()
+void MouseReachRotaryController::moveToNextPellet()
 {
   long travel_duration;
   modular_server_.property(constants::travel_duration_property_name).getValue(travel_duration);
@@ -173,22 +173,22 @@ void RotaryPelletControllerSimple::moveToNextPellet()
   moveToNextPellet(travel_duration,reverse_direction,play_tone_before_move);
 }
 
-long RotaryPelletControllerSimple::getPelletIndex()
+long MouseReachRotaryController::getPelletIndex()
 {
   return pellet_index_;
 }
 
-// long RotaryPelletControllerSimple::getPosition()
+// long MouseReachRotaryController::getPosition()
 // {
 //   return StepDirControllerSimple::getPosition(constants::channel);
 // }
 
-// bool RotaryPelletControllerSimple::pelletRepeating()
+// bool MouseReachRotaryController::pelletRepeating()
 // {
 //   return pellet_repeating_;
 // }
 
-void RotaryPelletControllerSimple::playTone()
+void MouseReachRotaryController::playTone()
 {
   long tone_frequency;
   modular_server_.property(constants::tone_frequency_property_name).getValue(tone_frequency);
@@ -197,22 +197,22 @@ void RotaryPelletControllerSimple::playTone()
   tone(constants::speaker_pin,tone_frequency,tone_duration);
 }
 
-// void RotaryPelletControllerSimple::startPelletRepeat()
+// void MouseReachRotaryController::startPelletRepeat()
 // {
 //   long pellet_repeat_period;
 //   modular_server_.property(constants::pellet_repeat_period_property_name).getValue(pellet_repeat_period);
-//   event_id_pair_ = event_controller_.addInfinitePwmUsingDelay(makeFunctor((Functor1<int> *)0,*this,&RotaryPelletControllerSimple::repeatPelletHandler),
-//                                                               makeFunctor((Functor1<int> *)0,*this,&RotaryPelletControllerSimple::dummyHandler),
+//   event_id_pair_ = event_controller_.addInfinitePwmUsingDelay(makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::repeatPelletHandler),
+//                                                               makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::dummyHandler),
 //                                                               constants::pellet_repeat_period_delay,
 //                                                               pellet_repeat_period,
 //                                                               pellet_repeat_period/2,
 //                                                               0);
-//   event_controller_.addStartFunctor(event_id_pair_,makeFunctor((Functor1<int> *)0,*this,&RotaryPelletControllerSimple::startPelletRepeatHandler));
-//   event_controller_.addStopFunctor(event_id_pair_,makeFunctor((Functor1<int> *)0,*this,&RotaryPelletControllerSimple::stopPelletRepeatHandler));
+//   event_controller_.addStartFunctor(event_id_pair_,makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::startPelletRepeatHandler));
+//   event_controller_.addStopFunctor(event_id_pair_,makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::stopPelletRepeatHandler));
 //   event_controller_.enable(event_id_pair_);
 // }
 
-// void RotaryPelletControllerSimple::stopPelletRepeat()
+// void MouseReachRotaryController::stopPelletRepeat()
 // {
 //   event_controller_.remove(event_id_pair_);
 // }
@@ -234,37 +234,37 @@ void RotaryPelletControllerSimple::playTone()
 // modular_server_.property(property_name).getElementValue(element_index,value) value type must match the property array element default type
 // modular_server_.property(property_name).setElementValue(element_index,value) value type must match the property array element default type
 
-// void RotaryPelletControllerSimple::startPelletRepeatHandler(int index)
+// void MouseReachRotaryController::startPelletRepeatHandler(int index)
 // {
 //   pellet_repeating_ = true;
 // }
 
-// void RotaryPelletControllerSimple::stopPelletRepeatHandler(int index)
+// void MouseReachRotaryController::stopPelletRepeatHandler(int index)
 // {
 //   pellet_repeating_ = false;
 // }
 
-void RotaryPelletControllerSimple::atPositionHandler(size_t channel, long position)
+void MouseReachRotaryController::atPositionHandler(size_t channel, long position)
 {
   moving_ = false;
 }
 
-void RotaryPelletControllerSimple::getPelletIndexHandler()
+void MouseReachRotaryController::getPelletIndexHandler()
 {
   modular_server_.response().returnResult(getPelletIndex());
 }
 
-// void RotaryPelletControllerSimple::getPositionHandler()
+// void MouseReachRotaryController::getPositionHandler()
 // {
 //   modular_server_.response().returnResult(getPosition());
 // }
 
-// void RotaryPelletControllerSimple::pelletRepeatingHandler()
+// void MouseReachRotaryController::pelletRepeatingHandler()
 // {
 //   modular_server_.response().returnResult(pelletRepeating());
 // }
 
-void RotaryPelletControllerSimple::stopHandler()
+void MouseReachRotaryController::stopHandler()
 {
   // stopPelletRepeat();
   long channel;
@@ -272,13 +272,13 @@ void RotaryPelletControllerSimple::stopHandler()
   stop(channel);
 }
 
-// void RotaryPelletControllerSimple::stopAllHandler()
+// void MouseReachRotaryController::stopAllHandler()
 // {
 //   // stopPelletRepeat();
 //   stopAll();
 // }
 
-void RotaryPelletControllerSimple::moveToNextPelletHandler(modular_server::Interrupt * interrupt_ptr)
+void MouseReachRotaryController::moveToNextPelletHandler(modular_server::Interrupt * interrupt_ptr)
 {
   // bool pellet_repeat;
   // modular_server_.property(constants::pellet_repeat_property_name).getValue(pellet_repeat);
@@ -296,21 +296,21 @@ void RotaryPelletControllerSimple::moveToNextPelletHandler(modular_server::Inter
   // }
 }
 
-void RotaryPelletControllerSimple::playToneHandler(modular_server::Interrupt * interrupt_ptr)
+void MouseReachRotaryController::playToneHandler(modular_server::Interrupt * interrupt_ptr)
 {
   playTone();
 }
 
-// void RotaryPelletControllerSimple::repeatPelletHandler(int index)
+// void MouseReachRotaryController::repeatPelletHandler(int index)
 // {
 //   moveToNextPellet();
 // }
 
-// void RotaryPelletControllerSimple::dummyHandler(int index)
+// void MouseReachRotaryController::dummyHandler(int index)
 // {
 // }
 
-void RotaryPelletControllerSimple::updateTravelDurationRangeHandler()
+void MouseReachRotaryController::updateTravelDurationRangeHandler()
 {
   // long microsteps_per_step;
   // modular_server_.property(constants::microsteps_per_step_property_name).getValue(microsteps_per_step);

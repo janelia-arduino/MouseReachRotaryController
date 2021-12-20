@@ -1,12 +1,12 @@
 // ----------------------------------------------------------------------------
-// RotaryPelletControllerSimple.h
+// MouseReachRotaryController.h
 //
 //
 // Authors:
 // Peter Polidoro polidorop@janelia.hhmi.org
 // ----------------------------------------------------------------------------
-#ifndef ROTARY_PELLET_CONTROLLER_SIMPLE_H
-#define ROTARY_PELLET_CONTROLLER_SIMPLE_H
+#ifndef MOUSE_REACH_ROTARY_CONTROLLER_H
+#define MOUSE_REACH_ROTARY_CONTROLLER_H
 #include "Flash.h"
 #include <EEPROM.h>
 #include "Streaming.h"
@@ -34,11 +34,11 @@
 #include "utility/Constants.h"
 
 
-class RotaryPelletControllerSimple : public StepDirControllerSimple
+class MouseReachRotaryController : public StepDirControllerSimple
 {
 public:
-  RotaryPelletControllerSimple();
-  ~RotaryPelletControllerSimple();
+  MouseReachRotaryController();
+  ~MouseReachRotaryController();
   virtual void setup();
   void moveToNextPellet(const long travel_duration,
                         const bool reverse_direction,
@@ -58,16 +58,16 @@ public:
   // virtual void stopPelletRepeatHandler(int index);
 
 private:
-  modular_server::Property properties_[rotary_pellet_controller_simple::constants::PROPERTY_COUNT_MAX];
-  modular_server::Parameter parameters_[rotary_pellet_controller_simple::constants::PARAMETER_COUNT_MAX];
-  modular_server::Function functions_[rotary_pellet_controller_simple::constants::FUNCTION_COUNT_MAX];
-  modular_server::Callback callbacks_[rotary_pellet_controller_simple::constants::CALLBACK_COUNT_MAX];
+  modular_server::Property properties_[mouse_reach_rotary_controller::constants::PROPERTY_COUNT_MAX];
+  modular_server::Parameter parameters_[mouse_reach_rotary_controller::constants::PARAMETER_COUNT_MAX];
+  modular_server::Function functions_[mouse_reach_rotary_controller::constants::FUNCTION_COUNT_MAX];
+  modular_server::Callback callbacks_[mouse_reach_rotary_controller::constants::CALLBACK_COUNT_MAX];
 
   long pellet_index_;
   bool moving_;
   // bool pellet_repeating_;
 
-  // EventController<rotary_pellet_controller_simple::constants::EVENT_COUNT_MAX> event_controller_;
+  // EventController<mouse_reach_rotary_controller::constants::EVENT_COUNT_MAX> event_controller_;
   // EventIdPair event_id_pair_;
 
   // Handlers

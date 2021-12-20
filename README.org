@@ -1,0 +1,76 @@
+#+TITLE: MouseReachRotaryController
+#+AUTHOR: Peter Polidoro
+#+EMAIL: peter@polidoro.io
+
+* Library Information
+- Name :: MouseReachRotaryController
+- Version :: 0.1.1
+- License :: BSD
+- URL :: https://github.com/janelia-arduino/MouseReachRotaryController
+- Author :: Peter Polidoro
+- Email :: peter@polidoro.io
+
+** Description
+
+Modular device lickport array controller library.
+
+* Webpage Documentation
+
+[[https://janelia-arduino.github.io/MouseReachRotaryController/]]
+
+* API NAMES
+
+#+BEGIN_SRC js
+
+{
+  "ancestors": [
+    "ModularServer",
+    "ModularDeviceBase",
+    "DigitalController"
+  ],
+  "firmware": [
+    {
+      "name": "MouseReachRotaryController",
+      "version": "0.1.1"
+    }
+  ],
+  "verbosity": "NAMES",
+  "functions": [
+    "dispenseLickportForDuration",
+    "dispenseLickportsForDuration",
+    "dispenseAllLickportsForDuration",
+    "dispenseLickportsForDurations",
+    "getActivatedLickports",
+    "activateOnlyLickport",
+    "activateOnlyLickports",
+    "activateLickport",
+    "activateLickports",
+    "deactivateLickport",
+    "deactivateLickports",
+    "getAndClearLickData"
+  ],
+  "parameters": [
+    "lickport",
+    "lickports",
+    "dispense_duration",
+    "dispense_durations"
+  ],
+  "properties": [
+    "syncOnDuration",
+    "syncPeriodMin",
+    "syncPeriodMax",
+    "dispenseDelays",
+    "dispensePeriods",
+    "dispenseCounts",
+    "activatedDispenseDurations"
+  ],
+  "callbacks": [
+    "calibrateLickSensor",
+    "manageLickStatusChange",
+    "activateAllLickports",
+    "deactivateAllLickports"
+  ]
+}
+
+#+END_SRC
+

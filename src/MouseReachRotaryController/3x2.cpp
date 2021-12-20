@@ -1,18 +1,16 @@
 // ----------------------------------------------------------------------------
-// 5x3.h
+// 3x2.cpp
 //
 //
 // Authors:
 // Peter Polidoro polidorop@janelia.hhmi.org
 // ----------------------------------------------------------------------------
-#ifndef ROTARY_PELLET_CONTROLLER_SIMPLE_5X3_CONSTANTS_H
-#define ROTARY_PELLET_CONTROLLER_SIMPLE_5X3_CONSTANTS_H
-#include "Constants.h"
+#include "3x2.h"
 
 
-#if defined(__AVR_ATmega2560__)
+#if defined(__MK20DX256__)
 
-namespace rotary_pellet_controller_simple
+namespace mouse_reach_rotary_controller
 {
 namespace constants
 {
@@ -21,7 +19,6 @@ namespace constants
 // Units
 
 // Properties
-// Property values must be long, double, bool, long[], double[], bool[], char[], ConstantString *, (ConstantString *)[]
 
 // Parameters
 
@@ -32,5 +29,4 @@ namespace constants
 // Errors
 }
 }
-#endif
 #endif

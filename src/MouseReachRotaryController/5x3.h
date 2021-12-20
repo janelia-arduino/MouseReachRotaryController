@@ -1,26 +1,27 @@
 // ----------------------------------------------------------------------------
-// 5x3.cpp
+// 5x3.h
 //
 //
 // Authors:
 // Peter Polidoro polidorop@janelia.hhmi.org
 // ----------------------------------------------------------------------------
-#include "5x3.h"
+#ifndef MOUSE_REACH_ROTARY_CONTROLLER_5X3_CONSTANTS_H
+#define MOUSE_REACH_ROTARY_CONTROLLER_5X3_CONSTANTS_H
+#include "Constants.h"
 
 
 #if defined(__AVR_ATmega2560__)
 
-namespace rotary_pellet_controller_simple
+namespace mouse_reach_rotary_controller
 {
 namespace constants
 {
-const size_t speaker_pin = 46;
-
 // Interrupts
 
 // Units
 
 // Properties
+// Property values must be long, double, bool, long[], double[], bool[], char[], ConstantString *, (ConstantString *)[]
 
 // Parameters
 
@@ -31,4 +32,5 @@ const size_t speaker_pin = 46;
 // Errors
 }
 }
+#endif
 #endif
