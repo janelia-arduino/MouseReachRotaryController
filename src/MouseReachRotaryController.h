@@ -3,43 +3,34 @@
 //
 //
 // Authors:
-// Peter Polidoro polidorop@janelia.hhmi.org
+// Peter Polidoro peter@polidoro.io
 // ----------------------------------------------------------------------------
 #ifndef MOUSE_REACH_ROTARY_CONTROLLER_H
 #define MOUSE_REACH_ROTARY_CONTROLLER_H
-#include "Flash.h"
-#include <EEPROM.h>
-#include "Streaming.h"
-#include "ArduinoJson.h"
-#include "JsonSanitizer.h"
-#include "JsonStream.h"
-#include "Array.h"
-#include "Vector.h"
-#include "MemoryFree.h"
-#include "ConstantVariable.h"
-#include "SavedVariable.h"
-#include "Functor.h"
-#include "IndexedContainer.h"
-#include "FunctorCallbacks.h"
+#include <ArduinoJson.h>
+#include <JsonStream.h>
+#include <Array.h>
+#include <Vector.h>
+#include <ConstantVariable.h>
+#include <Functor.h>
 
-#include "TimerThree.h"
-#include "EventController.h"
+#include <EventController.h>
 
-#include "ModularClient.h"
+#include <AudioController.h>
 
-#include "ModularServer.h"
-#include "ModularDeviceBase.h"
-#include "StepDirControllerSimple.h"
+#include <ModularServer.h>
+#include <ModularDeviceBase.h>
+#include <StepDirController.h>
+#include <StepperController.h>
 
-#include "utility/Constants.h"
+#include "MouseReachRotaryController/Constants.h"
 
 
-class MouseReachRotaryController : public StepDirControllerSimple
+class MouseReachRotaryController : public StepperController
 {
 public:
-  MouseReachRotaryController();
-  ~MouseReachRotaryController();
   virtual void setup();
+
   void moveToNextPellet(const long travel_duration,
                         const bool reverse_direction,
                         const bool play_tone_before_move);

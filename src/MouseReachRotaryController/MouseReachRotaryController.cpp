@@ -10,28 +10,24 @@
 
 using namespace mouse_reach_rotary_controller;
 
-MouseReachRotaryController::MouseReachRotaryController()
-{
-}
-
-MouseReachRotaryController::~MouseReachRotaryController()
-{
-  disable(constants::channel);
-}
-
 void MouseReachRotaryController::setup()
 {
   // Parent Setup
-  StepDirControllerSimple::setup();
+  StepperControllerSimple::setup();
   enable(constants::channel);
+
+  // Reset Watchdog
+  resetWatchdog();
+
+  // Event Controller Setup
+  // event_controller_.setup();
+
+  // Clients Setup
 
   // Variable Setup
   pellet_index_ = 0;
   moving_ = false;
   // pellet_repeating_ = false;
-
-  // Event Controller Setup
-  // event_controller_.setup();
 
   // Pin Setup
 
@@ -44,10 +40,10 @@ void MouseReachRotaryController::setup()
 
   // Add Firmware
   modular_server_.addFirmware(constants::firmware_info,
-                              properties_,
-                              parameters_,
-                              functions_,
-                              callbacks_);
+    properties_,
+    parameters_,
+    functions_,
+    callbacks_);
 
   // Properties
   // modular_server::Property & microsteps_per_step_property = modular_server_.createProperty(constants::microsteps_per_step_property_name,constants::microsteps_per_step_default);
@@ -112,23 +108,17 @@ void MouseReachRotaryController::setup()
   move_to_next_pellet_callback.addProperty(travel_duration_property);
   move_to_next_pellet_callback.addProperty(reverse_direction_property);
   move_to_next_pellet_callback.addProperty(play_tone_before_move_property);
-#if defined(__AVR_ATmega2560__)
-  move_to_next_pellet_callback.attachTo(step_dir_controller_simple::constants::int_stepper_interrupt_name,modular_server::interrupt::mode_falling);
-#endif
 
   modular_server::Callback & play_tone_callback = modular_server_.createCallback(constants::play_tone_callback_name);
   play_tone_callback.attachFunctor(makeFunctor((Functor1<modular_server::Interrupt *> *)0,*this,&MouseReachRotaryController::playToneHandler));
   play_tone_callback.addProperty(tone_frequency_property);
   play_tone_callback.addProperty(tone_duration_property);
-#if defined(__AVR_ATmega2560__)
-  play_tone_callback.attachTo(step_dir_controller_simple::constants::int_aux_interrupt_name,modular_server::interrupt::mode_falling);
-#endif
 
 }
 
 void MouseReachRotaryController::moveToNextPellet(const long travel_duration,
-                                                    const bool reverse_direction,
-                                                    const bool play_tone_before_move)
+  const bool reverse_direction,
+  const bool play_tone_before_move)
 {
   if (moving_)
   {

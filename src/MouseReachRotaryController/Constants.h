@@ -16,10 +16,8 @@ namespace mouse_reach_rotary_controller
 namespace constants
 {
 //MAX values must be >= 1, >= created/copied count, < RAM limit
-// enum{PROPERTY_COUNT_MAX=10};
 enum{PROPERTY_COUNT_MAX=6};
 enum{PARAMETER_COUNT_MAX=1};
-// enum{FUNCTION_COUNT_MAX=3};
 enum{FUNCTION_COUNT_MAX=1};
 enum{CALLBACK_COUNT_MAX=2};
 
@@ -97,8 +95,7 @@ extern ConstantString move_to_next_pellet_callback_name;
 extern ConstantString play_tone_callback_name;
 
 // Errors
+#include "TEENSY40.h"
 }
 }
-#include "5x3.h"
-#include "3x2.h"
 #endif

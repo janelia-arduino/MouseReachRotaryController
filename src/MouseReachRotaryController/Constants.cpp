@@ -24,6 +24,8 @@ const modular_server::FirmwareInfo firmware_info =
     .version_patch=0,
   };
 
+CONSTANT_STRING(hardware_name,"mouse_reach_controller");
+
 const size_t channel = 0;
 
 const long pellet_repeat_period_delay = 20;
