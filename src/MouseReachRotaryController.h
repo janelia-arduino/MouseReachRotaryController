@@ -14,9 +14,9 @@
 #include <ConstantVariable.h>
 #include <Functor.h>
 
-#include <EventController.h>
+// #include <EventController.h>
 
-#include <AudioController.h>
+// #include <AudioController.h>
 
 #include <ModularServer.h>
 #include <ModularDeviceBase.h>
@@ -36,26 +36,25 @@ public:
                         const bool play_tone_before_move);
   void moveToNextPellet();
   long getPelletIndex();
-  // long getPosition();
   // bool pelletRepeating();
-  void playTone();
+  // void playTone();
 
   // void startPelletRepeat();
   // void stopPelletRepeat();
 
   // Handlers
-  virtual void atPositionHandler(size_t index, long position);
   // virtual void startPelletRepeatHandler(int index);
   // virtual void stopPelletRepeatHandler(int index);
 
 private:
+  modular_server::Pin pins_[mouse_reach_rotary_controller::constants::PIN_COUNT_MAX];
+
   modular_server::Property properties_[mouse_reach_rotary_controller::constants::PROPERTY_COUNT_MAX];
   modular_server::Parameter parameters_[mouse_reach_rotary_controller::constants::PARAMETER_COUNT_MAX];
   modular_server::Function functions_[mouse_reach_rotary_controller::constants::FUNCTION_COUNT_MAX];
   modular_server::Callback callbacks_[mouse_reach_rotary_controller::constants::CALLBACK_COUNT_MAX];
 
   long pellet_index_;
-  bool moving_;
   // bool pellet_repeating_;
 
   // EventController<mouse_reach_rotary_controller::constants::EVENT_COUNT_MAX> event_controller_;
@@ -63,12 +62,11 @@ private:
 
   // Handlers
   void getPelletIndexHandler();
-  // void getPositionHandler();
   // void pelletRepeatingHandler();
   void stopHandler();
   // void stopAllHandler();
-  void moveToNextPelletHandler(modular_server::Interrupt * interrupt_ptr);
-  void playToneHandler(modular_server::Interrupt * interrupt_ptr);
+  void moveToNextPelletHandler(modular_server::Pin * pin_ptr);
+  // void playToneHandler(modular_server::Pin * pin_ptr);
   // void repeatPelletHandler(int index);
   // void dummyHandler(int index);
   void updateTravelDurationRangeHandler();

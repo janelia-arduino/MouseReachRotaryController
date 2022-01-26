@@ -8,7 +8,8 @@
 #ifndef MOUSE_REACH_ROTARY_CONTROLLER_CONSTANTS_H
 #define MOUSE_REACH_ROTARY_CONTROLLER_CONSTANTS_H
 #include "ConstantVariable.h"
-#include "StepDirControllerSimple.h"
+#include "StepDirController.h"
+#include "StepperController.h"
 
 
 namespace mouse_reach_rotary_controller
@@ -16,7 +17,7 @@ namespace mouse_reach_rotary_controller
 namespace constants
 {
 //MAX values must be >= 1, >= created/copied count, < RAM limit
-enum{PROPERTY_COUNT_MAX=6};
+enum{PROPERTY_COUNT_MAX=9};
 enum{PARAMETER_COUNT_MAX=1};
 enum{FUNCTION_COUNT_MAX=1};
 enum{CALLBACK_COUNT_MAX=2};
@@ -26,10 +27,14 @@ extern ConstantString device_name;
 extern ConstantString firmware_name;
 extern const modular_server::FirmwareInfo firmware_info;
 
-extern const size_t channel;
-extern const size_t speaker_pin;
+extern ConstantString hardware_name;
+extern const modular_server::HardwareInfo hardware_info;
 
-enum{EVENT_COUNT_MAX=2};
+enum{CHANNEL_COUNT=1};
+extern const size_t channel;
+// extern const size_t speaker_pin;
+
+// enum{EVENT_COUNT_MAX=2};
 
 extern const long pellet_repeat_period_delay;
 
@@ -41,14 +46,19 @@ extern ConstantString frequency_units;
 
 // Properties
 // Property values must be long, double, bool, long[], double[], bool[], char[], ConstantString *, (ConstantString *)[]
-// extern ConstantString microsteps_per_step_property_name;
-// extern const long microsteps_per_step_min;
-// extern const long microsteps_per_step_max;
-extern const long microsteps_per_step_default;
+extern const long channel_count;
 
-// extern ConstantString steps_per_revolution_property_name;
-// extern const long steps_per_revolution_min;
-// extern const long steps_per_revolution_max;
+extern const long steps_per_position_units_default[CHANNEL_COUNT];
+
+extern const long velocity_max_default[CHANNEL_COUNT];
+
+extern const long velocity_min_default[CHANNEL_COUNT];
+
+extern const long acceleration_max_default[CHANNEL_COUNT];
+
+extern ConstantString steps_per_revolution_property_name;
+extern const long steps_per_revolution_min;
+extern const long steps_per_revolution_max;
 extern const long steps_per_revolution_default;
 
 extern ConstantString pellets_per_revolution_property_name;
@@ -95,7 +105,7 @@ extern ConstantString move_to_next_pellet_callback_name;
 extern ConstantString play_tone_callback_name;
 
 // Errors
+}
+}
 #include "TEENSY40.h"
-}
-}
 #endif

@@ -37,14 +37,31 @@ CONSTANT_STRING(duration_units,"ms");
 CONSTANT_STRING(frequency_units,"Hz");
 
 // Properties
-// CONSTANT_STRING(microsteps_per_step_property_name,"microstepsPerStep");
-// const long microsteps_per_step_min = 1;
-// const long microsteps_per_step_max = 256;
-const long microsteps_per_step_default = 256;
+const long channel_count = CHANNEL_COUNT;
 
-// CONSTANT_STRING(steps_per_revolution_property_name,"stepsPerRevolution");
-// const long steps_per_revolution_min = 1;
-// const long steps_per_revolution_max = 10000;
+const long steps_per_position_units_default[CHANNEL_COUNT] =
+{
+  1,
+};
+
+const long velocity_max_default[CHANNEL_COUNT] =
+{
+  200000,
+};
+
+const long velocity_min_default[CHANNEL_COUNT] =
+{
+  20000,
+};
+
+const long acceleration_max_default[CHANNEL_COUNT] =
+{
+  200000,
+};
+
+CONSTANT_STRING(steps_per_revolution_property_name,"stepsPerRevolution");
+const long steps_per_revolution_min = 1;
+const long steps_per_revolution_max = 10000;
 const long steps_per_revolution_default = 200;
 
 CONSTANT_STRING(pellets_per_revolution_property_name,"pelletsPerRevolution");

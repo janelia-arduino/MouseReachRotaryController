@@ -13,8 +13,7 @@ using namespace mouse_reach_rotary_controller;
 void MouseReachRotaryController::setup()
 {
   // Parent Setup
-  StepperControllerSimple::setup();
-  enable(constants::channel);
+  StepperController::setup();
 
   // Reset Watchdog
   resetWatchdog();
@@ -26,7 +25,6 @@ void MouseReachRotaryController::setup()
 
   // Variable Setup
   pellet_index_ = 0;
-  moving_ = false;
   // pellet_repeating_ = false;
 
   // Pin Setup
@@ -35,6 +33,9 @@ void MouseReachRotaryController::setup()
   modular_server_.setDeviceName(constants::device_name);
 
   // Add Hardware
+  modular_server_.removeHardware();
+  modular_server_.addHardware(constants::hardware_info,
+    pins_);
 
   // Interrupts
 
@@ -46,13 +47,29 @@ void MouseReachRotaryController::setup()
     callbacks_);
 
   // Properties
-  // modular_server::Property & microsteps_per_step_property = modular_server_.createProperty(constants::microsteps_per_step_property_name,constants::microsteps_per_step_default);
-  // microsteps_per_step_property.setRange(constants::microsteps_per_step_min,constants::microsteps_per_step_max);
-  // microsteps_per_step_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateTravelDurationRangeHandler));
+  modular_server::Property & channel_count_property = modular_server_.property(step_dir_controller::constants::channel_count_property_name);
+  channel_count_property.disableFunctors();
+  channel_count_property.setDefaultValue(constants::channel_count);
+  channel_count_property.setRange(constants::channel_count,constants::channel_count);
+  channel_count_property.reenableFunctors();
 
-  // modular_server::Property & steps_per_revolution_property = modular_server_.createProperty(constants::steps_per_revolution_property_name,constants::steps_per_revolution_default);
-  // steps_per_revolution_property.setRange(constants::steps_per_revolution_min,constants::steps_per_revolution_max);
-  // steps_per_revolution_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateTravelDurationRangeHandler));
+  modular_server::Property & steps_per_position_units_property = modular_server_.property(step_dir_controller::constants::steps_per_position_units_property_name);
+  steps_per_position_units_property.disableFunctors();
+  steps_per_position_units_property.setDefaultValue(constants::steps_per_position_units_default);
+  steps_per_position_units_property.reenableFunctors();
+
+  modular_server::Property & velocity_max_property = modular_server_.property(step_dir_controller::constants::velocity_max_property_name);
+  velocity_max_property.setDefaultValue(constants::velocity_max_default);
+
+  modular_server::Property & velocity_min_property = modular_server_.property(step_dir_controller::constants::velocity_min_property_name);
+  velocity_min_property.setDefaultValue(constants::velocity_min_default);
+
+  modular_server::Property & acceleration_max_property = modular_server_.property(step_dir_controller::constants::acceleration_max_property_name);
+  acceleration_max_property.setDefaultValue(constants::acceleration_max_default);
+
+  modular_server::Property & steps_per_revolution_property = modular_server_.createProperty(constants::steps_per_revolution_property_name,constants::steps_per_revolution_default);
+  steps_per_revolution_property.setRange(constants::steps_per_revolution_min,constants::steps_per_revolution_max);
+  steps_per_revolution_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateTravelDurationRangeHandler));
 
   modular_server::Property & pellets_per_revolution_property = modular_server_.createProperty(constants::pellets_per_revolution_property_name,constants::pellets_per_revolution_default);
   pellets_per_revolution_property.setRange(constants::pellets_per_revolution_min,constants::pellets_per_revolution_max);
@@ -63,15 +80,15 @@ void MouseReachRotaryController::setup()
 
   modular_server::Property & reverse_direction_property = modular_server_.createProperty(constants::reverse_direction_property_name,constants::reverse_direction_default);
 
-  modular_server::Property & tone_frequency_property = modular_server_.createProperty(constants::tone_frequency_property_name,constants::tone_frequency_default);
-  tone_frequency_property.setRange(constants::tone_frequency_min,constants::tone_frequency_max);
-  tone_frequency_property.setUnits(constants::frequency_units);
+  // modular_server::Property & tone_frequency_property = modular_server_.createProperty(constants::tone_frequency_property_name,constants::tone_frequency_default);
+  // tone_frequency_property.setRange(constants::tone_frequency_min,constants::tone_frequency_max);
+  // tone_frequency_property.setUnits(constants::frequency_units);
 
-  modular_server::Property & tone_duration_property = modular_server_.createProperty(constants::tone_duration_property_name,constants::tone_duration_default);
-  tone_duration_property.setRange(constants::tone_duration_min,constants::tone_duration_max);
-  tone_duration_property.setUnits(constants::duration_units);
+  // modular_server::Property & tone_duration_property = modular_server_.createProperty(constants::tone_duration_property_name,constants::tone_duration_default);
+  // tone_duration_property.setRange(constants::tone_duration_min,constants::tone_duration_max);
+  // tone_duration_property.setUnits(constants::duration_units);
 
-  modular_server::Property & play_tone_before_move_property = modular_server_.createProperty(constants::play_tone_before_move_property_name,constants::play_tone_before_move_default);
+  // modular_server::Property & play_tone_before_move_property = modular_server_.createProperty(constants::play_tone_before_move_property_name,constants::play_tone_before_move_default);
 
   // modular_server::Property & pellet_repeat_property = modular_server_.createProperty(constants::pellet_repeat_property_name,constants::pellet_repeat_default);
 
@@ -96,7 +113,7 @@ void MouseReachRotaryController::setup()
   // pellet_repeating_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::pelletRepeatingHandler));
   // pellet_repeating_function.setResultTypeBool();
 
-  modular_server::Function & stop_function = modular_server_.function(step_dir_controller_simple::constants::stop_function_name);
+  modular_server::Function & stop_function = modular_server_.function(step_dir_controller::constants::stop_function_name);
   stop_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::stopHandler));
 
   // modular_server::Function & stop_all_function = modular_server_.function(step_dir_controller_simple::constants::stop_all_function_name);
@@ -104,52 +121,55 @@ void MouseReachRotaryController::setup()
 
   // Callbacks
   modular_server::Callback & move_to_next_pellet_callback = modular_server_.createCallback(constants::move_to_next_pellet_callback_name);
-  move_to_next_pellet_callback.attachFunctor(makeFunctor((Functor1<modular_server::Interrupt *> *)0,*this,&MouseReachRotaryController::moveToNextPelletHandler));
+  move_to_next_pellet_callback.attachFunctor(makeFunctor((Functor1<modular_server::Pin *> *)0,*this,&MouseReachRotaryController::moveToNextPelletHandler));
   move_to_next_pellet_callback.addProperty(travel_duration_property);
   move_to_next_pellet_callback.addProperty(reverse_direction_property);
-  move_to_next_pellet_callback.addProperty(play_tone_before_move_property);
+  // move_to_next_pellet_callback.addProperty(play_tone_before_move_property);
 
-  modular_server::Callback & play_tone_callback = modular_server_.createCallback(constants::play_tone_callback_name);
-  play_tone_callback.attachFunctor(makeFunctor((Functor1<modular_server::Interrupt *> *)0,*this,&MouseReachRotaryController::playToneHandler));
-  play_tone_callback.addProperty(tone_frequency_property);
-  play_tone_callback.addProperty(tone_duration_property);
+  // modular_server::Callback & play_tone_callback = modular_server_.createCallback(constants::play_tone_callback_name);
+  // play_tone_callback.attachFunctor(makeFunctor((Functor1<modular_server::Pin *> *)0,*this,&MouseReachRotaryController::playToneHandler));
+  // play_tone_callback.addProperty(tone_frequency_property);
+  // play_tone_callback.addProperty(tone_duration_property);
 
+  enable(constants::channel);
+  zero(constants::channel);
 }
 
 void MouseReachRotaryController::moveToNextPellet(const long travel_duration,
   const bool reverse_direction,
   const bool play_tone_before_move)
 {
-  if (moving_)
+  if (getVelocity(constants::channel) > 0)
   {
     return;
   }
-  // long microsteps_per_step;
-  // modular_server_.property(constants::microsteps_per_step_property_name).getValue(microsteps_per_step);
-  // long steps_per_revolution;
-  // modular_server_.property(constants::steps_per_revolution_property_name).getValue(steps_per_revolution);
-  long microsteps_per_step = constants::microsteps_per_step_default;
-  long steps_per_revolution = constants::steps_per_revolution_default;
+  long microsteps_per_step;
+  modular_server_.property(stepper_controller::constants::microsteps_per_step_property_name).getElementValue(constants::channel,microsteps_per_step);
+
+  long steps_per_revolution;
+  modular_server_.property(constants::steps_per_revolution_property_name).getValue(steps_per_revolution);
+
   long pellets_per_revolution;
   modular_server_.property(constants::pellets_per_revolution_property_name).getValue(pellets_per_revolution);
+
   long pellet_position_delta;
+  pellet_position_delta = (steps_per_revolution*microsteps_per_step)/pellets_per_revolution;
   if (!reverse_direction)
   {
     ++pellet_index_;
-    pellet_position_delta = (steps_per_revolution*microsteps_per_step)/pellets_per_revolution;
   }
   else
   {
     --pellet_index_;
-    pellet_position_delta = -(steps_per_revolution*microsteps_per_step)/pellets_per_revolution;
+    pellet_position_delta *= -1;
   }
   long speed = (steps_per_revolution*microsteps_per_step*1000)/(travel_duration*pellets_per_revolution);
-  if (play_tone_before_move)
-  {
-    playTone();
-  }
-  moving_ = true;
-  moveByAt(constants::channel,pellet_position_delta,speed);
+  // if (play_tone_before_move)
+  // {
+  //   playTone();
+  // }
+  // moveByAt(constants::channel,pellet_position_delta,speed);
+  moveBy(constants::channel,pellet_position_delta);
 }
 
 void MouseReachRotaryController::moveToNextPellet()
@@ -168,24 +188,19 @@ long MouseReachRotaryController::getPelletIndex()
   return pellet_index_;
 }
 
-// long MouseReachRotaryController::getPosition()
-// {
-//   return StepDirControllerSimple::getPosition(constants::channel);
-// }
-
 // bool MouseReachRotaryController::pelletRepeating()
 // {
 //   return pellet_repeating_;
 // }
 
-void MouseReachRotaryController::playTone()
-{
-  long tone_frequency;
-  modular_server_.property(constants::tone_frequency_property_name).getValue(tone_frequency);
-  long tone_duration;
-  modular_server_.property(constants::tone_duration_property_name).getValue(tone_duration);
-  tone(constants::speaker_pin,tone_frequency,tone_duration);
-}
+// void MouseReachRotaryController::playTone()
+// {
+//   long tone_frequency;
+//   modular_server_.property(constants::tone_frequency_property_name).getValue(tone_frequency);
+//   long tone_duration;
+//   modular_server_.property(constants::tone_duration_property_name).getValue(tone_duration);
+//   tone(constants::speaker_pin,tone_frequency,tone_duration);
+// }
 
 // void MouseReachRotaryController::startPelletRepeat()
 // {
@@ -234,20 +249,10 @@ void MouseReachRotaryController::playTone()
 //   pellet_repeating_ = false;
 // }
 
-void MouseReachRotaryController::atPositionHandler(size_t channel, long position)
-{
-  moving_ = false;
-}
-
 void MouseReachRotaryController::getPelletIndexHandler()
 {
   modular_server_.response().returnResult(getPelletIndex());
 }
-
-// void MouseReachRotaryController::getPositionHandler()
-// {
-//   modular_server_.response().returnResult(getPosition());
-// }
 
 // void MouseReachRotaryController::pelletRepeatingHandler()
 // {
@@ -257,9 +262,7 @@ void MouseReachRotaryController::getPelletIndexHandler()
 void MouseReachRotaryController::stopHandler()
 {
   // stopPelletRepeat();
-  long channel;
-  modular_server_.parameter(step_dir_controller_simple::constants::channel_parameter_name).getValue(channel);
-  stop(channel);
+  stop(constants::channel);
 }
 
 // void MouseReachRotaryController::stopAllHandler()
@@ -268,7 +271,7 @@ void MouseReachRotaryController::stopHandler()
 //   stopAll();
 // }
 
-void MouseReachRotaryController::moveToNextPelletHandler(modular_server::Interrupt * interrupt_ptr)
+void MouseReachRotaryController::moveToNextPelletHandler(modular_server::Pin * pin_ptr)
 {
   // bool pellet_repeat;
   // modular_server_.property(constants::pellet_repeat_property_name).getValue(pellet_repeat);
@@ -286,10 +289,10 @@ void MouseReachRotaryController::moveToNextPelletHandler(modular_server::Interru
   // }
 }
 
-void MouseReachRotaryController::playToneHandler(modular_server::Interrupt * interrupt_ptr)
-{
-  playTone();
-}
+// void MouseReachRotaryController::playToneHandler(modular_server::Pin * pin_ptr)
+// {
+//   playTone();
+// }
 
 // void MouseReachRotaryController::repeatPelletHandler(int index)
 // {
@@ -302,15 +305,16 @@ void MouseReachRotaryController::playToneHandler(modular_server::Interrupt * int
 
 void MouseReachRotaryController::updateTravelDurationRangeHandler()
 {
-  // long microsteps_per_step;
-  // modular_server_.property(constants::microsteps_per_step_property_name).getValue(microsteps_per_step);
-  // long steps_per_revolution;
-  // modular_server_.property(constants::steps_per_revolution_property_name).getValue(steps_per_revolution);
-  long microsteps_per_step = constants::microsteps_per_step_default;
-  long steps_per_revolution = constants::steps_per_revolution_default;
+  long microsteps_per_step;
+  modular_server_.property(stepper_controller::constants::microsteps_per_step_property_name).getElementValue(constants::channel,microsteps_per_step);
+
+  long steps_per_revolution;
+  modular_server_.property(constants::steps_per_revolution_property_name).getValue(steps_per_revolution);
+
   long pellets_per_revolution;
   modular_server_.property(constants::pellets_per_revolution_property_name).getValue(pellets_per_revolution);
-  const long travel_duration_min = (steps_per_revolution*microsteps_per_step*1000)/(getVelocityMax()*pellets_per_revolution);
+
+  const long travel_duration_min = (steps_per_revolution*microsteps_per_step*1000)/(getVelocityUpperLimit(constants::channel)*pellets_per_revolution);
   const long travel_duration_max = (steps_per_revolution*microsteps_per_step*1000)/pellets_per_revolution;
   modular_server_.property(constants::travel_duration_property_name).setDefaultValue(constants::travel_duration_default);
   modular_server_.property(constants::travel_duration_property_name).setRange(travel_duration_min,travel_duration_max);
