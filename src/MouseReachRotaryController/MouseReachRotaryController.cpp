@@ -80,15 +80,15 @@ void MouseReachRotaryController::setup()
 
   modular_server::Property & reverse_direction_property = modular_server_.createProperty(constants::reverse_direction_property_name,constants::reverse_direction_default);
 
-  // modular_server::Property & tone_frequency_property = modular_server_.createProperty(constants::tone_frequency_property_name,constants::tone_frequency_default);
-  // tone_frequency_property.setRange(constants::tone_frequency_min,constants::tone_frequency_max);
-  // tone_frequency_property.setUnits(constants::frequency_units);
+  modular_server::Property & tone_frequency_property = modular_server_.createProperty(constants::tone_frequency_property_name,constants::tone_frequency_default);
+  tone_frequency_property.setRange(constants::tone_frequency_min,constants::tone_frequency_max);
+  tone_frequency_property.setUnits(constants::frequency_units);
 
-  // modular_server::Property & tone_duration_property = modular_server_.createProperty(constants::tone_duration_property_name,constants::tone_duration_default);
-  // tone_duration_property.setRange(constants::tone_duration_min,constants::tone_duration_max);
-  // tone_duration_property.setUnits(constants::duration_units);
+  modular_server::Property & tone_duration_property = modular_server_.createProperty(constants::tone_duration_property_name,constants::tone_duration_default);
+  tone_duration_property.setRange(constants::tone_duration_min,constants::tone_duration_max);
+  tone_duration_property.setUnits(constants::duration_units);
 
-  // modular_server::Property & play_tone_before_move_property = modular_server_.createProperty(constants::play_tone_before_move_property_name,constants::play_tone_before_move_default);
+  modular_server::Property & play_tone_before_move_property = modular_server_.createProperty(constants::play_tone_before_move_property_name,constants::play_tone_before_move_default);
 
   // modular_server::Property & pellet_repeat_property = modular_server_.createProperty(constants::pellet_repeat_property_name,constants::pellet_repeat_default);
 
@@ -126,13 +126,15 @@ void MouseReachRotaryController::setup()
   move_to_next_pellet_callback.addProperty(reverse_direction_property);
   // move_to_next_pellet_callback.addProperty(play_tone_before_move_property);
 
-  // modular_server::Callback & play_tone_callback = modular_server_.createCallback(constants::play_tone_callback_name);
-  // play_tone_callback.attachFunctor(makeFunctor((Functor1<modular_server::Pin *> *)0,*this,&MouseReachRotaryController::playToneHandler));
-  // play_tone_callback.addProperty(tone_frequency_property);
-  // play_tone_callback.addProperty(tone_duration_property);
+  modular_server::Callback & play_tone_callback = modular_server_.createCallback(constants::play_tone_callback_name);
+  play_tone_callback.attachFunctor(makeFunctor((Functor1<modular_server::Pin *> *)0,*this,&MouseReachRotaryController::playToneHandler));
+  play_tone_callback.addProperty(tone_frequency_property);
+  play_tone_callback.addProperty(tone_duration_property);
 
   enable(constants::channel);
   zero(constants::channel);
+
+  // audio_controller_.setup();
 }
 
 void MouseReachRotaryController::moveToNextPellet(const long travel_duration,
@@ -193,14 +195,18 @@ long MouseReachRotaryController::getPelletIndex()
 //   return pellet_repeating_;
 // }
 
-// void MouseReachRotaryController::playTone()
-// {
-//   long tone_frequency;
-//   modular_server_.property(constants::tone_frequency_property_name).getValue(tone_frequency);
-//   long tone_duration;
-//   modular_server_.property(constants::tone_duration_property_name).getValue(tone_duration);
-//   tone(constants::speaker_pin,tone_frequency,tone_duration);
-// }
+void MouseReachRotaryController::playTone(long frequency,
+  long duration)
+{
+  // audio_controller_.addTonePwm(frequency,&(audio_controller::constants::speaker_all),10,duration,duration,1);
+  audio_controller_.addTonePwmAt(5000,
+    &(audio_controller::constants::speaker_all),
+    50,
+    10,
+    200,
+    200,
+    1);
+}
 
 // void MouseReachRotaryController::startPelletRepeat()
 // {
@@ -221,6 +227,12 @@ long MouseReachRotaryController::getPelletIndex()
 // {
 //   event_controller_.remove(event_id_pair_);
 // }
+
+void MouseReachRotaryController::setupDriver(size_t channel)
+{
+  StepperController::setupDriver(channel);
+  enable(channel);
+}
 
 // Handlers must be non-blocking (avoid 'delay')
 //
@@ -289,10 +301,14 @@ void MouseReachRotaryController::moveToNextPelletHandler(modular_server::Pin * p
   // }
 }
 
-// void MouseReachRotaryController::playToneHandler(modular_server::Pin * pin_ptr)
-// {
-//   playTone();
-// }
+void MouseReachRotaryController::playToneHandler(modular_server::Pin * pin_ptr)
+{
+  long tone_frequency;
+  modular_server_.property(constants::tone_frequency_property_name).getValue(tone_frequency);
+  long tone_duration;
+  modular_server_.property(constants::tone_duration_property_name).getValue(tone_duration);
+  playTone(tone_frequency,tone_duration);
+}
 
 // void MouseReachRotaryController::repeatPelletHandler(int index)
 // {
