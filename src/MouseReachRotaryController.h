@@ -14,9 +14,9 @@
 #include <ConstantVariable.h>
 #include <Functor.h>
 
-// #include <EventController.h>
+#include <EventController.h>
 
-#include <AudioController.h>
+#include <AudioApparatus.h>
 
 #include <ModularServer.h>
 #include <ModularDeviceBase.h>
@@ -31,21 +31,18 @@ class MouseReachRotaryController : public StepperController
 public:
   virtual void setup();
 
-  void moveToNextPellet(const long travel_duration,
-                        const bool reverse_direction,
-                        const bool play_tone_before_move);
-  void moveToNextPellet();
+  void dispense(long pellet_position_delta,
+    bool reverse_direction,
+    long crosstalk_suppression_duration,
+    long retrigger_suppression_duration);
+  void dispense();
   long getPelletIndex();
-  // bool pelletRepeating();
   void playTone(long frequency,
-    long duration);
-
-  // void startPelletRepeat();
-  // void stopPelletRepeat();
-
-  // Handlers
-  // virtual void startPelletRepeatHandler(int index);
-  // virtual void stopPelletRepeatHandler(int index);
+    long volume,
+    long tone_duration,
+    long crosstalk_suppression_duration,
+    long retrigger_suppression_duration);
+  void playTone();
 
 protected:
   virtual void setupDriver(size_t channel);
@@ -58,25 +55,29 @@ private:
   modular_server::Function functions_[mouse_reach_rotary_controller::constants::FUNCTION_COUNT_MAX];
   modular_server::Callback callbacks_[mouse_reach_rotary_controller::constants::CALLBACK_COUNT_MAX];
 
+  modular_server::Pin * dispense_pin_ptr_;
+  const ConstantString * dispense_pin_mode_ptr_;
+  modular_server::Pin * play_tone_pin_ptr_;
+  const ConstantString * play_tone_pin_mode_ptr_;
+
   long pellet_index_;
 
-  AudioController audio_controller_;
+  EventController<mouse_reach_rotary_controller::constants::EVENT_COUNT_MAX> event_controller_;
 
-  // bool pellet_repeating_;
+  AudioApparatus<mouse_reach_rotary_controller::constants::EVENT_COUNT_MAX> audio_apparatus_;
 
-  // EventController<mouse_reach_rotary_controller::constants::EVENT_COUNT_MAX> event_controller_;
-  // EventIdPair event_id_pair_;
+  bool dispensing_;
+  bool playing_tone_;
 
   // Handlers
+  void updateVelocityMaxHandler();
   void getPelletIndexHandler();
-  // void pelletRepeatingHandler();
-  void stopHandler();
-  // void stopAllHandler();
-  void moveToNextPelletHandler(modular_server::Pin * pin_ptr);
+  void initializeDispenseTriggerHandler(int index);
+  void dispenseHandler(modular_server::Pin * pin_ptr);
+  void endDispenseCrosstalkSuppressionHandler(int index);
+  void initializePlayToneTriggerHandler(int index);
   void playToneHandler(modular_server::Pin * pin_ptr);
-  // void repeatPelletHandler(int index);
-  // void dummyHandler(int index);
-  void updateTravelDurationRangeHandler();
+  void endPlayToneCrosstalkSuppressionHandler(int index);
 };
 
 #endif

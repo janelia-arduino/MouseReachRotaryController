@@ -15,19 +15,19 @@ void MouseReachRotaryController::setup()
   // Parent Setup
   StepperController::setup();
 
+  event_controller_.setup();
+  audio_apparatus_.setup(event_controller_);
+  audio_apparatus_.stop();
+
   // Reset Watchdog
   resetWatchdog();
-
-  // Event Controller Setup
-  // event_controller_.setup();
 
   // Clients Setup
 
   // Variable Setup
   pellet_index_ = 0;
-  // pellet_repeating_ = false;
-
-  // Pin Setup
+  dispensing_ = false;
+  playing_tone_ = false;
 
   // Set Device ID
   modular_server_.setDeviceName(constants::device_name);
@@ -37,7 +37,22 @@ void MouseReachRotaryController::setup()
   modular_server_.addHardware(constants::hardware_info,
     pins_);
 
-  // Interrupts
+  // Pins
+  modular_server::Pin & signal_a_pin = modular_server_.createPin(constants::signal_a_pin_name,
+    constants::signal_a_pin_number);
+  signal_a_pin.setModeDigitalInputPullup();
+
+  modular_server::Pin & signal_b_pin = modular_server_.createPin(constants::signal_b_pin_name,
+    constants::signal_b_pin_number);
+  signal_b_pin.setModeDigitalInputPullup();
+
+  modular_server::Pin & signal_c_pin = modular_server_.createPin(constants::signal_c_pin_name,
+    constants::signal_c_pin_number);
+  signal_c_pin.setModeDigitalInputPullup();
+
+  modular_server::Pin & signal_d_pin = modular_server_.createPin(constants::signal_d_pin_name,
+    constants::signal_d_pin_number);
+  signal_d_pin.setModeDigitalInputPullup();
 
   // Add Firmware
   modular_server_.addFirmware(constants::firmware_info,
@@ -58,45 +73,51 @@ void MouseReachRotaryController::setup()
   steps_per_position_units_property.setDefaultValue(constants::steps_per_position_units_default);
   steps_per_position_units_property.reenableFunctors();
 
-  modular_server::Property & velocity_max_property = modular_server_.property(step_dir_controller::constants::velocity_max_property_name);
-  velocity_max_property.setDefaultValue(constants::velocity_max_default);
-
   modular_server::Property & velocity_min_property = modular_server_.property(step_dir_controller::constants::velocity_min_property_name);
   velocity_min_property.setDefaultValue(constants::velocity_min_default);
 
   modular_server::Property & acceleration_max_property = modular_server_.property(step_dir_controller::constants::acceleration_max_property_name);
   acceleration_max_property.setDefaultValue(constants::acceleration_max_default);
 
+  modular_server::Property & microsteps_per_step_property = modular_server_.property(stepper_controller::constants::microsteps_per_step_property_name);
+  microsteps_per_step_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateVelocityMaxHandler));
+
   modular_server::Property & steps_per_revolution_property = modular_server_.createProperty(constants::steps_per_revolution_property_name,constants::steps_per_revolution_default);
   steps_per_revolution_property.setRange(constants::steps_per_revolution_min,constants::steps_per_revolution_max);
-  steps_per_revolution_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateTravelDurationRangeHandler));
+  steps_per_revolution_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateVelocityMaxHandler));
 
   modular_server::Property & pellets_per_revolution_property = modular_server_.createProperty(constants::pellets_per_revolution_property_name,constants::pellets_per_revolution_default);
   pellets_per_revolution_property.setRange(constants::pellets_per_revolution_min,constants::pellets_per_revolution_max);
-  pellets_per_revolution_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateTravelDurationRangeHandler));
+  pellets_per_revolution_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateVelocityMaxHandler));
 
   modular_server::Property & travel_duration_property = modular_server_.createProperty(constants::travel_duration_property_name,constants::travel_duration_default);
+  travel_duration_property.setRange(constants::travel_duration_min,constants::travel_duration_max);
   travel_duration_property.setUnits(constants::duration_units);
+  travel_duration_property.attachPostSetValueFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::updateVelocityMaxHandler));
 
   modular_server::Property & reverse_direction_property = modular_server_.createProperty(constants::reverse_direction_property_name,constants::reverse_direction_default);
+
+  modular_server::Property & crosstalk_suppression_duration_property = modular_server_.createProperty(constants::crosstalk_suppression_duration_property_name,constants::crosstalk_suppression_duration_default);
+  crosstalk_suppression_duration_property.setRange(constants::crosstalk_suppression_duration_min,constants::crosstalk_suppression_duration_max);
+  crosstalk_suppression_duration_property.setUnits(constants::duration_units);
+
+  modular_server::Property & retrigger_suppression_duration_property = modular_server_.createProperty(constants::retrigger_suppression_duration_property_name,constants::retrigger_suppression_duration_default);
+  retrigger_suppression_duration_property.setRange(constants::retrigger_suppression_duration_min,constants::retrigger_suppression_duration_max);
+  retrigger_suppression_duration_property.setUnits(constants::duration_units);
 
   modular_server::Property & tone_frequency_property = modular_server_.createProperty(constants::tone_frequency_property_name,constants::tone_frequency_default);
   tone_frequency_property.setRange(constants::tone_frequency_min,constants::tone_frequency_max);
   tone_frequency_property.setUnits(constants::frequency_units);
 
+  modular_server::Property & tone_volume_property = modular_server_.createProperty(constants::tone_volume_property_name,constants::tone_volume_default);
+  tone_volume_property.setRange(constants::tone_volume_min,constants::tone_volume_max);
+  tone_volume_property.setUnits(constants::percent_units);
+
   modular_server::Property & tone_duration_property = modular_server_.createProperty(constants::tone_duration_property_name,constants::tone_duration_default);
   tone_duration_property.setRange(constants::tone_duration_min,constants::tone_duration_max);
   tone_duration_property.setUnits(constants::duration_units);
 
-  modular_server::Property & play_tone_before_move_property = modular_server_.createProperty(constants::play_tone_before_move_property_name,constants::play_tone_before_move_default);
-
-  // modular_server::Property & pellet_repeat_property = modular_server_.createProperty(constants::pellet_repeat_property_name,constants::pellet_repeat_default);
-
-  // modular_server::Property & pellet_repeat_period_property = modular_server_.createProperty(constants::pellet_repeat_period_property_name,constants::pellet_repeat_period_default);
-  // pellet_repeat_period_property.setRange(constants::pellet_repeat_period_min,constants::pellet_repeat_period_max);
-  // pellet_repeat_period_property.setUnits(constants::duration_units);
-
-  updateTravelDurationRangeHandler();
+  updateVelocityMaxHandler();
 
   // Parameters
 
@@ -105,46 +126,63 @@ void MouseReachRotaryController::setup()
   get_pellet_index_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::getPelletIndexHandler));
   get_pellet_index_function.setResultTypeLong();
 
-  // modular_server::Function & get_position_function = modular_server_.createFunction(constants::get_position_function_name);
-  // get_position_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::getPositionHandler));
-  // get_position_function.setResultTypeLong();
-
-  // modular_server::Function & pellet_repeating_function = modular_server_.createFunction(constants::pellet_repeating_function_name);
-  // pellet_repeating_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::pelletRepeatingHandler));
-  // pellet_repeating_function.setResultTypeBool();
-
-  modular_server::Function & stop_function = modular_server_.function(step_dir_controller::constants::stop_function_name);
-  stop_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::stopHandler));
-
-  // modular_server::Function & stop_all_function = modular_server_.function(step_dir_controller_simple::constants::stop_all_function_name);
-  // stop_all_function.attachFunctor(makeFunctor((Functor0 *)0,*this,&MouseReachRotaryController::stopAllHandler));
-
   // Callbacks
-  modular_server::Callback & move_to_next_pellet_callback = modular_server_.createCallback(constants::move_to_next_pellet_callback_name);
-  move_to_next_pellet_callback.attachFunctor(makeFunctor((Functor1<modular_server::Pin *> *)0,*this,&MouseReachRotaryController::moveToNextPelletHandler));
-  move_to_next_pellet_callback.addProperty(travel_duration_property);
-  move_to_next_pellet_callback.addProperty(reverse_direction_property);
-  // move_to_next_pellet_callback.addProperty(play_tone_before_move_property);
+  dispense_pin_ptr_ = &signal_b_pin;
+  dispense_pin_mode_ptr_ = &modular_server::constants::pin_mode_interrupt_falling;
+  modular_server::Callback & dispense_callback = modular_server_.createCallback(constants::dispense_callback_name);
+  dispense_callback.attachFunctor(makeFunctor((Functor1<modular_server::Pin *> *)0,*this,&MouseReachRotaryController::dispenseHandler));
+  dispense_callback.addProperty(travel_duration_property);
+  dispense_callback.addProperty(reverse_direction_property);
 
+  play_tone_pin_ptr_ = &signal_d_pin;
+  play_tone_pin_mode_ptr_ = &modular_server::constants::pin_mode_interrupt_falling;
   modular_server::Callback & play_tone_callback = modular_server_.createCallback(constants::play_tone_callback_name);
   play_tone_callback.attachFunctor(makeFunctor((Functor1<modular_server::Pin *> *)0,*this,&MouseReachRotaryController::playToneHandler));
   play_tone_callback.addProperty(tone_frequency_property);
+  play_tone_callback.addProperty(tone_volume_property);
   play_tone_callback.addProperty(tone_duration_property);
 
   enable(constants::channel);
   zero(constants::channel);
 
-  // audio_controller_.setup();
+  EventId initialize_trigger_event_id = event_controller_.addEventUsingDelay(makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::initializeDispenseTriggerHandler),
+    constants::initialize_trigger_delay);
+  event_controller_.enable(initialize_trigger_event_id);
+  initialize_trigger_event_id = event_controller_.addEventUsingDelay(makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::initializePlayToneTriggerHandler),
+    constants::initialize_trigger_delay);
+  event_controller_.enable(initialize_trigger_event_id);
 }
 
-void MouseReachRotaryController::moveToNextPellet(const long travel_duration,
-  const bool reverse_direction,
-  const bool play_tone_before_move)
+void MouseReachRotaryController::dispense(long pellet_position_delta,
+  bool reverse_direction,
+  long crosstalk_suppression_duration,
+  long retrigger_suppression_duration)
 {
-  if (getVelocity(constants::channel) > 0)
+  if (dispensing_)
   {
     return;
   }
+  dispensing_ = true;
+  if (!reverse_direction)
+  {
+    ++pellet_index_;
+  }
+  else
+  {
+    --pellet_index_;
+    pellet_position_delta *= -1;
+  }
+  moveBy(constants::channel,pellet_position_delta);
+  EventId crosstalk_suppression_event_id = event_controller_.addEventUsingDelay(makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::endPlayToneCrosstalkSuppressionHandler),
+    crosstalk_suppression_duration);
+  event_controller_.enable(crosstalk_suppression_event_id);
+  EventId retrigger_suppression_event_id = event_controller_.addEventUsingDelay(makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::initializeDispenseTriggerHandler),
+    retrigger_suppression_duration);
+  event_controller_.enable(retrigger_suppression_event_id);
+}
+
+void MouseReachRotaryController::dispense()
+{
   long microsteps_per_step;
   modular_server_.property(stepper_controller::constants::microsteps_per_step_property_name).getElementValue(constants::channel,microsteps_per_step);
 
@@ -155,34 +193,21 @@ void MouseReachRotaryController::moveToNextPellet(const long travel_duration,
   modular_server_.property(constants::pellets_per_revolution_property_name).getValue(pellets_per_revolution);
 
   long pellet_position_delta;
-  pellet_position_delta = (steps_per_revolution*microsteps_per_step)/pellets_per_revolution;
-  if (!reverse_direction)
-  {
-    ++pellet_index_;
-  }
-  else
-  {
-    --pellet_index_;
-    pellet_position_delta *= -1;
-  }
-  long speed = (steps_per_revolution*microsteps_per_step*1000)/(travel_duration*pellets_per_revolution);
-  // if (play_tone_before_move)
-  // {
-  //   playTone();
-  // }
-  // moveByAt(constants::channel,pellet_position_delta,speed);
-  moveBy(constants::channel,pellet_position_delta);
-}
+  pellet_position_delta = (microsteps_per_step*steps_per_revolution)/pellets_per_revolution;
 
-void MouseReachRotaryController::moveToNextPellet()
-{
-  long travel_duration;
-  modular_server_.property(constants::travel_duration_property_name).getValue(travel_duration);
   bool reverse_direction;
   modular_server_.property(constants::reverse_direction_property_name).getValue(reverse_direction);
-  bool play_tone_before_move;
-  modular_server_.property(constants::play_tone_before_move_property_name).getValue(play_tone_before_move);
-  moveToNextPellet(travel_duration,reverse_direction,play_tone_before_move);
+
+  long crosstalk_suppression_duration;
+  modular_server_.property(constants::crosstalk_suppression_duration_property_name).getValue(crosstalk_suppression_duration);
+
+  long retrigger_suppression_duration;
+  modular_server_.property(constants::retrigger_suppression_duration_property_name).getValue(retrigger_suppression_duration);
+
+  dispense(pellet_position_delta,
+    reverse_direction,
+    crosstalk_suppression_duration,
+    retrigger_suppression_duration);
 }
 
 long MouseReachRotaryController::getPelletIndex()
@@ -190,43 +215,56 @@ long MouseReachRotaryController::getPelletIndex()
   return pellet_index_;
 }
 
-// bool MouseReachRotaryController::pelletRepeating()
-// {
-//   return pellet_repeating_;
-// }
-
 void MouseReachRotaryController::playTone(long frequency,
-  long duration)
+  long volume,
+  long tone_duration,
+  long crosstalk_suppression_duration,
+  long retrigger_suppression_duration)
 {
-  // audio_controller_.addTonePwm(frequency,&(audio_controller::constants::speaker_all),10,duration,duration,1);
-  audio_controller_.addTonePwmAt(5000,
-    &(audio_controller::constants::speaker_all),
-    50,
+  if (playing_tone_)
+  {
+    return;
+  }
+  playing_tone_ = true;
+
+  audio_apparatus_.addTonePwmAt(frequency,
+    audio_apparatus::constants::SPEAKER_ALL,
+    volume,
     10,
-    200,
-    200,
+    tone_duration,
+    tone_duration,
     1);
+  EventId crosstalk_suppression_event_id = event_controller_.addEventUsingDelay(makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::endDispenseCrosstalkSuppressionHandler),
+    crosstalk_suppression_duration);
+  event_controller_.enable(crosstalk_suppression_event_id);
+  EventId retrigger_suppression_event_id = event_controller_.addEventUsingDelay(makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::initializePlayToneTriggerHandler),
+    retrigger_suppression_duration);
+  event_controller_.enable(retrigger_suppression_event_id);
 }
 
-// void MouseReachRotaryController::startPelletRepeat()
-// {
-//   long pellet_repeat_period;
-//   modular_server_.property(constants::pellet_repeat_period_property_name).getValue(pellet_repeat_period);
-//   event_id_pair_ = event_controller_.addInfinitePwmUsingDelay(makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::repeatPelletHandler),
-//                                                               makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::dummyHandler),
-//                                                               constants::pellet_repeat_period_delay,
-//                                                               pellet_repeat_period,
-//                                                               pellet_repeat_period/2,
-//                                                               0);
-//   event_controller_.addStartFunctor(event_id_pair_,makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::startPelletRepeatHandler));
-//   event_controller_.addStopFunctor(event_id_pair_,makeFunctor((Functor1<int> *)0,*this,&MouseReachRotaryController::stopPelletRepeatHandler));
-//   event_controller_.enable(event_id_pair_);
-// }
+void MouseReachRotaryController::playTone()
+{
+  long tone_frequency;
+  modular_server_.property(constants::tone_frequency_property_name).getValue(tone_frequency);
 
-// void MouseReachRotaryController::stopPelletRepeat()
-// {
-//   event_controller_.remove(event_id_pair_);
-// }
+  long tone_volume;
+  modular_server_.property(constants::tone_volume_property_name).getValue(tone_volume);
+
+  long tone_duration;
+  modular_server_.property(constants::tone_duration_property_name).getValue(tone_duration);
+
+  long crosstalk_suppression_duration;
+  modular_server_.property(constants::crosstalk_suppression_duration_property_name).getValue(crosstalk_suppression_duration);
+
+  long retrigger_suppression_duration;
+  modular_server_.property(constants::retrigger_suppression_duration_property_name).getValue(retrigger_suppression_duration);
+
+  playTone(tone_frequency,
+    tone_volume,
+    tone_duration,
+    crosstalk_suppression_duration,
+    retrigger_suppression_duration);
+}
 
 void MouseReachRotaryController::setupDriver(size_t channel)
 {
@@ -251,75 +289,7 @@ void MouseReachRotaryController::setupDriver(size_t channel)
 // modular_server_.property(property_name).getElementValue(element_index,value) value type must match the property array element default type
 // modular_server_.property(property_name).setElementValue(element_index,value) value type must match the property array element default type
 
-// void MouseReachRotaryController::startPelletRepeatHandler(int index)
-// {
-//   pellet_repeating_ = true;
-// }
-
-// void MouseReachRotaryController::stopPelletRepeatHandler(int index)
-// {
-//   pellet_repeating_ = false;
-// }
-
-void MouseReachRotaryController::getPelletIndexHandler()
-{
-  modular_server_.response().returnResult(getPelletIndex());
-}
-
-// void MouseReachRotaryController::pelletRepeatingHandler()
-// {
-//   modular_server_.response().returnResult(pelletRepeating());
-// }
-
-void MouseReachRotaryController::stopHandler()
-{
-  // stopPelletRepeat();
-  stop(constants::channel);
-}
-
-// void MouseReachRotaryController::stopAllHandler()
-// {
-//   // stopPelletRepeat();
-//   stopAll();
-// }
-
-void MouseReachRotaryController::moveToNextPelletHandler(modular_server::Pin * pin_ptr)
-{
-  // bool pellet_repeat;
-  // modular_server_.property(constants::pellet_repeat_property_name).getValue(pellet_repeat);
-  // if (!pellet_repeat)
-  // {
-    moveToNextPellet();
-  // }
-  // else if (!pellet_repeating_)
-  // {
-  //   startPelletRepeat();
-  // }
-  // else
-  // {
-  //   stopPelletRepeat();
-  // }
-}
-
-void MouseReachRotaryController::playToneHandler(modular_server::Pin * pin_ptr)
-{
-  long tone_frequency;
-  modular_server_.property(constants::tone_frequency_property_name).getValue(tone_frequency);
-  long tone_duration;
-  modular_server_.property(constants::tone_duration_property_name).getValue(tone_duration);
-  playTone(tone_frequency,tone_duration);
-}
-
-// void MouseReachRotaryController::repeatPelletHandler(int index)
-// {
-//   moveToNextPellet();
-// }
-
-// void MouseReachRotaryController::dummyHandler(int index)
-// {
-// }
-
-void MouseReachRotaryController::updateTravelDurationRangeHandler()
+void MouseReachRotaryController::updateVelocityMaxHandler()
 {
   long microsteps_per_step;
   modular_server_.property(stepper_controller::constants::microsteps_per_step_property_name).getElementValue(constants::channel,microsteps_per_step);
@@ -330,9 +300,69 @@ void MouseReachRotaryController::updateTravelDurationRangeHandler()
   long pellets_per_revolution;
   modular_server_.property(constants::pellets_per_revolution_property_name).getValue(pellets_per_revolution);
 
-  const long travel_duration_min = (steps_per_revolution*microsteps_per_step*1000)/(getVelocityUpperLimit(constants::channel)*pellets_per_revolution);
-  const long travel_duration_max = (steps_per_revolution*microsteps_per_step*1000)/pellets_per_revolution;
-  modular_server_.property(constants::travel_duration_property_name).setDefaultValue(constants::travel_duration_default);
-  modular_server_.property(constants::travel_duration_property_name).setRange(travel_duration_min,travel_duration_max);
+  long travel_duration;
+  modular_server_.property(constants::travel_duration_property_name).getValue(travel_duration);
+
+  long velocity_max = (microsteps_per_step*steps_per_revolution*1000)/(travel_duration*pellets_per_revolution);
+  velocity_max = (double)velocity_max * constants::velocity_max_scale_factor;
+
+  modular_server::Property & velocity_max_property = modular_server_.property(step_dir_controller::constants::velocity_max_property_name);
+  velocity_max_property.setRange(velocity_max,velocity_max);
+  velocity_max_property.setElementValue(constants::channel,velocity_max);
+}
+
+void MouseReachRotaryController::getPelletIndexHandler()
+{
+  modular_server_.response().returnResult(getPelletIndex());
+}
+
+void MouseReachRotaryController::initializeDispenseTriggerHandler(int index)
+{
+  dispensing_ = false;
+  modular_server_.callback(constants::dispense_callback_name).attachTo(*dispense_pin_ptr_,*dispense_pin_mode_ptr_);
+}
+
+void MouseReachRotaryController::dispenseHandler(modular_server::Pin * pin_ptr)
+{
+  if ((pin_ptr) and (pin_ptr->getValue()))
+  {
+    return;
+  }
+  modular_server_.callback(constants::play_tone_callback_name).detachFrom(*play_tone_pin_ptr_);
+  modular_server_.callback(constants::dispense_callback_name).detachFrom(*dispense_pin_ptr_);
+  dispense();
+}
+
+void MouseReachRotaryController::endDispenseCrosstalkSuppressionHandler(int index)
+{
+  if (not dispensing_)
+  {
+    modular_server_.callback(constants::dispense_callback_name).attachTo(*dispense_pin_ptr_,*dispense_pin_mode_ptr_);
+  }
+}
+
+void MouseReachRotaryController::initializePlayToneTriggerHandler(int index)
+{
+  playing_tone_ = false;
+  modular_server_.callback(constants::play_tone_callback_name).attachTo(*play_tone_pin_ptr_,*play_tone_pin_mode_ptr_);
+}
+
+void MouseReachRotaryController::playToneHandler(modular_server::Pin * pin_ptr)
+{
+  if ((pin_ptr) and (pin_ptr->getValue()))
+  {
+    return;
+  }
+  modular_server_.callback(constants::dispense_callback_name).detachFrom(*dispense_pin_ptr_);
+  modular_server_.callback(constants::play_tone_callback_name).detachFrom(*play_tone_pin_ptr_);
+  playTone();
+}
+
+void MouseReachRotaryController::endPlayToneCrosstalkSuppressionHandler(int index)
+{
+  if (not playing_tone_)
+  {
+    modular_server_.callback(constants::play_tone_callback_name).attachTo(*play_tone_pin_ptr_,*play_tone_pin_mode_ptr_);
+  }
 }
 

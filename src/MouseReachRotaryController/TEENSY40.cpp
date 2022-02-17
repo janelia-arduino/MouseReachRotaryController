@@ -22,6 +22,13 @@ const modular_server::HardwareInfo hardware_info =
 };
 
 // Pins
+const size_t signal_a_pin_number = 22;
+
+const size_t signal_b_pin_number = 4;
+
+const size_t signal_c_pin_number = 3;
+
+const size_t signal_d_pin_number = 2;
 
 // Units
 
