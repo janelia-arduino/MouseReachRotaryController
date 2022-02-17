@@ -1,0 +1,452 @@
+{
+  "id": "getApi",
+  "result": {
+    "ancestors": [
+      "ModularServer",
+      "ModularDeviceBase",
+      "StepDirController",
+      "StepperController"
+    ],
+    "firmware": [
+      {
+        "name": "MouseReachRotaryController",
+        "version": "1.0.0"
+      }
+    ],
+    "verbosity": "GENERAL",
+    "functions": [
+      {
+        "name": "getPelletIndex",
+        "result_info": {
+          "type": "long"
+        }
+      }
+    ],
+    "properties": [
+      {
+        "name": "stepsPerRevolution",
+        "type": "long",
+        "functions": [
+          {
+            "name": "getValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValue",
+            "parameters": [
+              "value"
+            ],
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "getDefaultValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValueToDefault",
+            "result_info": {
+              "type": "long"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "type": "long"
+          }
+        ]
+      },
+      {
+        "name": "pelletsPerRevolution",
+        "type": "long",
+        "functions": [
+          {
+            "name": "getValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValue",
+            "parameters": [
+              "value"
+            ],
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "getDefaultValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValueToDefault",
+            "result_info": {
+              "type": "long"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "type": "long"
+          }
+        ]
+      },
+      {
+        "name": "travelDuration",
+        "type": "long",
+        "functions": [
+          {
+            "name": "getValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValue",
+            "parameters": [
+              "value"
+            ],
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "getDefaultValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValueToDefault",
+            "result_info": {
+              "type": "long"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "type": "long"
+          }
+        ]
+      },
+      {
+        "name": "reverseDirection",
+        "type": "bool",
+        "functions": [
+          {
+            "name": "getValue",
+            "result_info": {
+              "type": "bool"
+            }
+          },
+          {
+            "name": "setValue",
+            "parameters": [
+              "value"
+            ],
+            "result_info": {
+              "type": "bool"
+            }
+          },
+          {
+            "name": "getDefaultValue",
+            "result_info": {
+              "type": "bool"
+            }
+          },
+          {
+            "name": "setValueToDefault",
+            "result_info": {
+              "type": "bool"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "name": "crosstalkSuppressionDuration",
+        "type": "long",
+        "functions": [
+          {
+            "name": "getValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValue",
+            "parameters": [
+              "value"
+            ],
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "getDefaultValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValueToDefault",
+            "result_info": {
+              "type": "long"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "type": "long"
+          }
+        ]
+      },
+      {
+        "name": "retriggerSuppressionDuration",
+        "type": "long",
+        "functions": [
+          {
+            "name": "getValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValue",
+            "parameters": [
+              "value"
+            ],
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "getDefaultValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValueToDefault",
+            "result_info": {
+              "type": "long"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "type": "long"
+          }
+        ]
+      },
+      {
+        "name": "toneFrequency",
+        "type": "long",
+        "functions": [
+          {
+            "name": "getValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValue",
+            "parameters": [
+              "value"
+            ],
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "getDefaultValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValueToDefault",
+            "result_info": {
+              "type": "long"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "type": "long"
+          }
+        ]
+      },
+      {
+        "name": "toneVolume",
+        "type": "long",
+        "functions": [
+          {
+            "name": "getValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValue",
+            "parameters": [
+              "value"
+            ],
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "getDefaultValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValueToDefault",
+            "result_info": {
+              "type": "long"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "type": "long"
+          }
+        ]
+      },
+      {
+        "name": "toneDuration",
+        "type": "long",
+        "functions": [
+          {
+            "name": "getValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValue",
+            "parameters": [
+              "value"
+            ],
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "getDefaultValue",
+            "result_info": {
+              "type": "long"
+            }
+          },
+          {
+            "name": "setValueToDefault",
+            "result_info": {
+              "type": "long"
+            }
+          }
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "type": "long"
+          }
+        ]
+      }
+    ],
+    "callbacks": [
+      {
+        "name": "dispense",
+        "properties": [
+          "travelDuration",
+          "reverseDirection"
+        ],
+        "functions": [
+          {
+            "name": "trigger"
+          },
+          {
+            "name": "attachTo",
+            "parameters": [
+              "pin_name",
+              "pin_mode"
+            ]
+          },
+          {
+            "name": "detachFrom",
+            "parameters": [
+              "pin_name"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "pin_name",
+            "type": "string"
+          },
+          {
+            "name": "pin_mode",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "playTone",
+        "properties": [
+          "toneFrequency",
+          "toneVolume",
+          "toneDuration"
+        ],
+        "functions": [
+          {
+            "name": "trigger"
+          },
+          {
+            "name": "attachTo",
+            "parameters": [
+              "pin_name",
+              "pin_mode"
+            ]
+          },
+          {
+            "name": "detachFrom",
+            "parameters": [
+              "pin_name"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "pin_name",
+            "type": "string"
+          },
+          {
+            "name": "pin_mode",
+            "type": "string"
+          }
+        ]
+      }
+    ]
+  }
+}

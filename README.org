@@ -21,5 +21,43 @@ Mouse reach rotary controller firmware
 * API NAMES
 
 #+BEGIN_SRC js
+
+{
+  "id": "getApi",
+  "result": {
+    "ancestors": [
+      "ModularServer",
+      "ModularDeviceBase",
+      "StepDirController",
+      "StepperController"
+    ],
+    "firmware": [
+      {
+        "name": "MouseReachRotaryController",
+        "version": "1.0.0"
+      }
+    ],
+    "verbosity": "NAMES",
+    "functions": [
+      "getPelletIndex"
+    ],
+    "properties": [
+      "stepsPerRevolution",
+      "pelletsPerRevolution",
+      "travelDuration",
+      "reverseDirection",
+      "crosstalkSuppressionDuration",
+      "retriggerSuppressionDuration",
+      "toneFrequency",
+      "toneVolume",
+      "toneDuration"
+    ],
+    "callbacks": [
+      "dispense",
+      "playTone"
+    ]
+  }
+}
+
 #+END_SRC
 
