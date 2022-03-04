@@ -39,7 +39,11 @@ Mouse reach rotary controller firmware
     ],
     "verbosity": "NAMES",
     "functions": [
-      "getPelletIndex"
+      "getPelletIndex",
+      "adjustPelletPosition"
+    ],
+    "parameters": [
+      "percentage_of_distance_between_pellets"
     ],
     "properties": [
       "stepsPerRevolution",
@@ -54,7 +58,8 @@ Mouse reach rotary controller firmware
     ],
     "callbacks": [
       "dispense",
-      "playTone"
+      "playTone",
+      "zeroPelletIndex"
     ]
   }
 }

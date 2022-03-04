@@ -64,6 +64,26 @@ const long acceleration_max_default[CHANNEL_COUNT] =
   1000000,
 };
 
+const long run_current_default[CHANNEL_COUNT] =
+{
+  100,
+};
+
+const long hold_current_default[CHANNEL_COUNT] =
+{
+  50,
+};
+
+const long hold_delay_default[CHANNEL_COUNT] =
+{
+  25,
+};
+
+const long pwm_offset_default[CHANNEL_COUNT] =
+{
+  10,
+};
+
 CONSTANT_STRING(steps_per_revolution_property_name,"stepsPerRevolution");
 const long steps_per_revolution_min = 1;
 const long steps_per_revolution_max = 10000;
@@ -108,13 +128,18 @@ const long tone_duration_max = 10000;
 const long tone_duration_default = 200;
 
 // Parameters
+CONSTANT_STRING(percentage_of_distance_between_pellets_parameter_name,"percentage_of_distance_between_pellets");
+const long percentage_of_distance_between_pellets_min = -100;
+const long percentage_of_distance_between_pellets_max = 100;
 
 // Functions
 CONSTANT_STRING(get_pellet_index_function_name,"getPelletIndex");
+CONSTANT_STRING(adjust_pellet_position_function_name,"adjustPelletPosition");
 
 // Callbacks
 CONSTANT_STRING(dispense_callback_name,"dispense");
 CONSTANT_STRING(play_tone_callback_name,"playTone");
+CONSTANT_STRING(zero_pellet_index_callback_name,"zeroPelletIndex");
 
 // Errors
 }

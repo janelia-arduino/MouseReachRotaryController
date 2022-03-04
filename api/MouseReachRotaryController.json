@@ -20,6 +20,18 @@
         "result_info": {
           "type": "long"
         }
+      },
+      {
+        "name": "adjustPelletPosition",
+        "parameters": [
+          "percentage_of_distance_between_pellets"
+        ]
+      }
+    ],
+    "parameters": [
+      {
+        "name": "percentage_of_distance_between_pellets",
+        "type": "long"
       }
     ],
     "properties": [
@@ -418,6 +430,37 @@
           "toneVolume",
           "toneDuration"
         ],
+        "functions": [
+          {
+            "name": "trigger"
+          },
+          {
+            "name": "attachTo",
+            "parameters": [
+              "pin_name",
+              "pin_mode"
+            ]
+          },
+          {
+            "name": "detachFrom",
+            "parameters": [
+              "pin_name"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "pin_name",
+            "type": "string"
+          },
+          {
+            "name": "pin_mode",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "zeroPelletIndex",
         "functions": [
           {
             "name": "trigger"

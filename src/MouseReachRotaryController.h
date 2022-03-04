@@ -31,12 +31,14 @@ class MouseReachRotaryController : public StepperController
 public:
   virtual void setup();
 
-  void dispense(long pellet_position_delta,
-    bool reverse_direction,
+  void dispense(long distance_between_pellets,
     long crosstalk_suppression_duration,
     long retrigger_suppression_duration);
   void dispense();
   long getPelletIndex();
+  void zeroPelletIndex();
+  void adjustPelletPosition(long percentage_of_distance_between_pellets,
+    long distance_between_pellets);
   void playTone(long frequency,
     long volume,
     long tone_duration,
@@ -62,6 +64,8 @@ private:
 
   long pellet_index_;
 
+  long getDistanceBetweenPellets();
+
   EventController<mouse_reach_rotary_controller::constants::EVENT_COUNT_MAX> event_controller_;
 
   AudioApparatus<mouse_reach_rotary_controller::constants::EVENT_COUNT_MAX> audio_apparatus_;
@@ -72,12 +76,14 @@ private:
   // Handlers
   void updateVelocityMaxHandler();
   void getPelletIndexHandler();
+  void adjustPelletPositionHandler();
   void initializeDispenseTriggerHandler(int index);
   void dispenseHandler(modular_server::Pin * pin_ptr);
   void endDispenseCrosstalkSuppressionHandler(int index);
   void initializePlayToneTriggerHandler(int index);
   void playToneHandler(modular_server::Pin * pin_ptr);
   void endPlayToneCrosstalkSuppressionHandler(int index);
+  void zeroPelletIndexHandler(modular_server::Pin * pin_ptr);
 };
 
 #endif

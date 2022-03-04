@@ -19,8 +19,8 @@ namespace constants
 //MAX values must be >= 1, >= created/copied count, < RAM limit
 enum{PROPERTY_COUNT_MAX=9};
 enum{PARAMETER_COUNT_MAX=1};
-enum{FUNCTION_COUNT_MAX=1};
-enum{CALLBACK_COUNT_MAX=2};
+enum{FUNCTION_COUNT_MAX=2};
+enum{CALLBACK_COUNT_MAX=3};
 
 extern ConstantString device_name;
 
@@ -69,6 +69,14 @@ extern const long velocity_min_default[CHANNEL_COUNT];
 
 extern const long acceleration_max_default[CHANNEL_COUNT];
 
+extern const long run_current_default[CHANNEL_COUNT];
+
+extern const long hold_current_default[CHANNEL_COUNT];
+
+extern const long hold_delay_default[CHANNEL_COUNT];
+
+extern const long pwm_offset_default[CHANNEL_COUNT];
+
 extern ConstantString steps_per_revolution_property_name;
 extern const long steps_per_revolution_min;
 extern const long steps_per_revolution_max;
@@ -113,13 +121,18 @@ extern const long tone_duration_max;
 extern const long tone_duration_default;
 
 // Parameters
+extern ConstantString percentage_of_distance_between_pellets_parameter_name;
+extern const long percentage_of_distance_between_pellets_min;
+extern const long percentage_of_distance_between_pellets_max;
 
 // Functions
 extern ConstantString get_pellet_index_function_name;
+extern ConstantString adjust_pellet_position_function_name;
 
 // Callbacks
 extern ConstantString dispense_callback_name;
 extern ConstantString play_tone_callback_name;
+extern ConstantString zero_pellet_index_callback_name;
 
 // Errors
 }
