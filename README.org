@@ -65,9 +65,3 @@ Mouse reach rotary controller firmware
 }
 
 #+END_SRC
-
-* Hardware
-
-** Motor
-
-NEMA 17 motor: Gecko Drive G717-90-4
